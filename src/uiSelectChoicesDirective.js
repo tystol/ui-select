@@ -68,7 +68,8 @@ uis.directive('uiSelectChoices',
         scope.$watch('$select.search', function(newValue) {
           if(newValue && !$select.open && $select.multiple) $select.activate(false, true);
           $select.activeIndex = $select.tagging.isActivated ? -1 : 0;
-          if (!attrs.minimumInputLength || $select.search.length >= attrs.minimumInputLength) {
+		  var minimumInputLength = attrs.minimumInputLength ? scope.$eval(attrs.minimumInputLength) : null;
+          if (!minimumInputLength || $select.search.length >= minimumInputLength) {
             $select.refresh(attrs.refresh);
           } else {
             $select.items = [];

@@ -1498,7 +1498,7 @@ describe('ui-select tests', function() {
 
   });
 
-  it('should call refresh function respecting minimum input length option', function () {
+  it('should call refresh function respecting minimum input length constant option', function () {
 
     var el = compileTemplate(
       '<ui-select ng-model="selection.selected"> \
@@ -1506,6 +1506,38 @@ describe('ui-select tests', function() {
         </ui-select-match> \
         <ui-select-choices repeat="person in people | filter: $select.search" \
           refresh="fetchFromServer($select.search)" refresh-delay="0" minimum-input-length="3"> \
+          <div ng-bind-html="person.name | highlight: $select.search"></div> \
+          <div ng-if="person.name==\'Wladimir\'"> \
+            <span class="only-once">I should appear only once</span>\
+          </div> \
+        </ui-select-choices> \
+      </ui-select>'
+    );
+
+    scope.fetchFromServer = function(){};
+
+    spyOn(scope, 'fetchFromServer');
+
+    el.scope().$select.search = 'r';
+    scope.$digest();
+    $timeout.flush();
+    expect(scope.fetchFromServer).not.toHaveBeenCalledWith('r');
+
+    el.scope().$select.search = 'red';
+    scope.$digest();
+    $timeout.flush();
+    expect(scope.fetchFromServer).toHaveBeenCalledWith('red');
+  });
+  
+
+  it('should call refresh function respecting minimum input length expression option', function () {
+
+    var el = compileTemplate(
+      '<ui-select ng-model="selection.selected"> \
+        <ui-select-match> \
+        </ui-select-match> \
+        <ui-select-choices repeat="person in people | filter: $select.search" \
+          refresh="fetchFromServer($select.search)" refresh-delay="0" minimum-input-length="people.length > 5 ? 3 : 0"> \
           <div ng-bind-html="person.name | highlight: $select.search"></div> \
           <div ng-if="person.name==\'Wladimir\'"> \
             <span class="only-once">I should appear only once</span>\
