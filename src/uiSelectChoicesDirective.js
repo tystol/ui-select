@@ -64,11 +64,12 @@ uis.directive('uiSelectChoices',
         scope.$on('$destroy', function() {
           choices.remove();
         });
+        
+        var minimumInputLength = 0;
 
         scope.$watch('$select.search', function(newValue) {
           if(newValue && !$select.open && $select.multiple) $select.activate(false, true);
           $select.activeIndex = $select.tagging.isActivated ? -1 : 0;
-		  var minimumInputLength = attrs.minimumInputLength ? scope.$eval(attrs.minimumInputLength) : null;
           if (!minimumInputLength || $select.search.length >= minimumInputLength) {
             $select.refresh(attrs.refresh);
           } else {
@@ -76,6 +77,11 @@ uis.directive('uiSelectChoices',
           }
         });
 
+        attrs.$observe('minimumInputLength', function() {
+          // $eval() is needed otherwise we get a string instead of a number
+          minimumInputLength = attrs.minimumInputLength ? scope.$eval(attrs.minimumInputLength) : 0;
+        });
+        
         attrs.$observe('refreshDelay', function() {
           // $eval() is needed otherwise we get a string instead of a number
           var refreshDelay = scope.$eval(attrs.refreshDelay);
